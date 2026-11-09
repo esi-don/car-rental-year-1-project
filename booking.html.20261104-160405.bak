@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Choose a vehicle and send a booking request to Esrom Ridez in Uganda.">
+  <meta name="theme-color" content="#f7f6f1">
+  <title>Booking | Esrom Ridez</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body class="booking-page">
+  <div class="site-shell">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="Esrom Ridez home"><span class="brand-mark" aria-hidden="true">E</span><span>Esrom <span>Ridez</span></span></a>
+      <button class="menu-button" id="menuButton" type="button" aria-label="Open navigation" aria-controls="primaryNavigation" aria-expanded="false"><span aria-hidden="true">☰</span></button>
+      <nav class="main-nav" id="primaryNavigation" aria-label="Primary navigation">
+        <a href="index.html">Home</a><a href="booking.html" aria-current="page">Booking</a><a href="how-it-works.html">How it works</a><a href="helpful-answers.html">Helpful answers</a><a href="contact.html">Contact</a>
+      </nav>
+    </header>
+    <main id="bookingPage">
+      <section class="page-intro section-pad" aria-labelledby="pageTitle"><p class="eyebrow">Booking request · Kampala · Entebbe · Jinja</p><h1 id="pageTitle">Let’s plan<br><em>your ride.</em></h1><p>Choose your dates and vehicle, then send a request. We’ll check availability and contact you before anything is confirmed.</p></section>
+      <section class="search-panel section-pad" aria-labelledby="searchTitle">
+        <div class="search-heading"><span class="search-icon" aria-hidden="true">⌕</span><div><h2 id="searchTitle">Where are you headed?</h2><p>Choose dates first, or go straight to the vehicle list.</p></div></div>
+        <form id="searchForm" class="search-form" action="https://formspree.io/f/xbdbqvpq" method="POST">
+          <input type="hidden" name="_subject" value="New vehicle booking request">
+          <label for="searchPickup">Pick-up point<select id="searchPickup" name="pickup_location" required><option value="Kampala">Kampala</option><option value="Entebbe">Entebbe</option><option value="Jinja">Jinja</option></select></label>
+          <label for="searchPickupDate">Pick-up date<input id="searchPickupDate" name="pickup_date" type="date" required></label>
+          <label for="searchReturnDate">Return date<input id="searchReturnDate" name="return_date" type="date" required></label>
+          <button type="submit">Send booking request</button>
+        </form>
+        
+        <!-- FIX: Added the missing bookingStatus element here -->
+        <p id="bookingStatus" aria-live="polite" style="margin-top: 1rem; font-weight: 500; color: var(--text-dark, #333);"></p>
+        
+      </section>
+      <section class="fleet-section section-pad" id="fleet" aria-labelledby="fleetTitle">
+        <div class="section-intro"><div><p class="eyebrow">Start your request</p><h2 id="fleetTitle">Choose your<br><em>vehicle.</em></h2></div><p>Select an available vehicle to see its details, enter your trip information, and review an estimate before sending.</p></div>
+        <p id="resultCount" aria-live="polite"></p>
+        <div id="vehicleGrid" aria-live="polite"></div>
+      </section>
+      <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="modal-close" id="closeModal" type="button" aria-label="Close dialog">×</button><div id="modalContent"></div></div></div>
+    </main>
+    <footer><a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">E</span><span>Esrom <span>Ridez</span></span></a><span>© 2026 Esrom Ridez Uganda</span><a class="admin-link" href="index.html#staff">Staff workspace <span aria-hidden="true">↗️</span></a></footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+  (() => {
+    const form = document.getElementById('searchForm');
+    const status = document.getElementById('bookingStatus');
+    const pickup = document.getElementById('searchPickupDate');
+    const returnDate = document.getElementById('searchReturnDate');
+    let sending = false;
+
+    const validateDates = () => {
+      returnDate.setCustomValidity(
+        pickup.value && returnDate.value && returnDate.value < pickup.value
+          ? 'Return date must be on or after the pick-up date.' : ''
+      );
+    };
+
+    pickup.addEventListener('input', validateDates);
+    returnDate.addEventListener('input', validateDates);
+
+    document.addEventListener('submit', async (event) => {
+      if (event.target !== form) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      if (sending) return;
+
+      validateDates();
+      if (!form.reportValidity()) return;
+
+      const button = form.querySelector('button[type="submit"]');
+      const originalLabel = button.textContent;
+      const data = new FormData(form);
+
+      sending = true;
+      button.disabled = true;
+      button.textContent = 'Sending…';
+      form.setAttribute('aria-busy', 'true');
+      status.textContent = 'Sending your booking request…';
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: data,
+          headers: { Accept: 'application/json' }
+        });
+
+        const result = await response.json().catch(() => null);
+
+        if (!response.ok || !result || result.ok === false || result.errors) {
+          const errors = result && Array.isArray(result.errors)
+            ? result.errors.map(error => error.message).filter(Boolean).join(' ')
+            : '';
+
+          throw new Error(
+            errors ||
+            'The booking service did not confirm your request. Please try again.'
+          );
+        }
+
+        status.textContent =
+          'Your booking request was submitted successfully. We will contact you to confirm availability.';
+      } catch (error) {
+        status.textContent = error instanceof TypeError
+          ? 'Unable to reach the booking service. Check your connection and try again. Your details have been kept.'
+          : error.message;
+      } finally {
+        sending = false;
+        button.disabled = false;
+        button.textContent = originalLabel;
+        form.removeAttribute('aria-busy');
+      }
+    }, true);
+  })();
+  </script>
+  <script src="script.js" defer></script>
+</body>
+</html>
