@@ -1,44 +1,13 @@
-const bookingEmailEndpoint = 'https://formspree.io/f/xbdbqvpq';
-async function sendBookingEmail(booking) {
-  const fields = { ...booking, _subject: 'New vehicle booking request: ' + booking.reference };
-  // A normal form submission works from local files and allows Formspree's CAPTCHA.
-  if (window.location.protocol === 'file:') {
-    const deliveryForm = document.createElement('form');
-    deliveryForm.method = 'POST';
-    deliveryForm.action = bookingEmailEndpoint;
-    for (const [name, value] of Object.entries(fields)) {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = name;
-      input.value = String(value);
-      deliveryForm.appendChild(input);
-    }
-    document.body.appendChild(deliveryForm);
-    deliveryForm.submit();
-    // Formspree displays the actual submission result after navigation.
-    return new Promise(() => {});
-  }
-  const data = new FormData();
-  for (const [name, value] of Object.entries(fields)) data.append(name, String(value));
-  let response;
-  try {
-    response = await fetch(bookingEmailEndpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
-  } catch {
-    throw new Error('Unable to reach the email service. Check your connection and try again.');
-  }
-  const result = await response.json().catch(() => null);
-  if (!response.ok || !result || result.ok === false || result.errors) {
-    const message = Array.isArray(result?.errors) ? result.errors.map(item => item.message).filter(Boolean).join(' ') : '';
-    throw new Error(message || 'The email service did not accept your request. Please try again or call +256 704 221 808.');
-  }
-}
 const seedVehicles = [
-  { id: 'toyota-premio', name: 'Toyota Premio', type: 'sedan', seats: 5, luggage: '2 large bags', transmission: 'Automatic', driver: 'Available on request', bestFor: 'Airport pickups and easy city days', price: 100000, available: true, image: 'car 1.png', images: ['car 2.png', 'car 3.png', 'car 4.png'], features: 'Fuel efficient · Bluetooth' },
-  { id: 'toyota-fielder', name: 'Toyota Fielder', type: 'sedan', seats: 5, luggage: '3 large bags', transmission: 'Automatic', driver: 'Available on request', bestFor: 'Kampala errands with extra boot space', price: 120000, available: true, image: 'car 5.png', images: ['car 6.png', 'car 7.png', 'car 8.png'], features: 'Large boot · Bluetooth' },
-  { id: 'range-rover', name: 'Range Rover', type: 'suv', seats: 5, luggage: '3 large bags', transmission: 'Automatic', driver: 'Available on request', bestFor: 'Family trips and mixed road conditions', price: 220000, available: true, image: 'car 10.png', images: ['car 11.png', 'car 12.png', 'car 13.png'], features: 'Cruise control · AWD' },
-  { id: 'toyota-rav4', name: 'Toyota RAV4', type: 'suv', seats: 5, luggage: '3 large bags', transmission: 'Automatic', driver: 'Available on request', bestFor: 'Weekend getaways with the family', price: 195000, available: true, image: 'car 14.png', images: ['car 15.png', 'car 16.png', 'car 17.png'], features: 'Apple CarPlay · AWD' },
-  { id: 'toyota-hiace', name: 'Toyota Hiace', type: 'van', seats: 14, luggage: '8 large bags', transmission: 'Manual', driver: 'Driver recommended', bestFor: 'Friends, teams, and small group tours', price: 350000, available: true, image: 'car 22.png', images: ['car 23.png', 'car 24.png', 'car 25.png'], features: '14 seats · Spacious' },
-  { id: 'mercedes sprinter', name: 'Mercedes Sprinter', type: 'van', seats: 22, luggage: '14 large bags', transmission: 'Manual', driver: 'Driver required', bestFor: 'Large groups, church trips, and events', price: 480000, available: false, image: 'car 18.png', images: ['car 19.png', 'car 20.png', 'car 21.png'], features: '22 seats · Group travel' }
+  { id: 'toyota-premio', name: 'Toyota Premio', type: 'sedan', seats: 5, luggage: '2 large bags', transmission: 'Automatic', driver: 'Available on request', bestFor: 'Airport pickups and easy city days', price: 145000, available: true, image: 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=900&q=80', images: ['https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=80'], features: 'Fuel efficient · Bluetooth' },
+  { id: 'toyota-wish', name: 'Toyota Wish', type: 'sedan', seats: 5, luggage: '2 large bags', transmission: 'Automatic', driver: 'Available on request', bestFor: 'Airport pickups and easy city days', price: 100000, available: true, image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=80', images: ['https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=80'], features: 'Fuel efficient · Bluetooth' },
+  { id: 'toyota-fielder', name: 'Toyota Fielder', type: 'sedan', seats: 5, luggage: '3 large bags', transmission: 'Automatic', driver: 'Available on request', bestFor: 'Kampala errands with extra boot space', price: 125000, available: true, image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=80', images: ['https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=1200&q=80'], features: 'Large boot · Bluetooth' },
+  { id: 'mazda-cx5', name: 'Mazda CX-5', type: 'suv', seats: 5, luggage: '3 large bags', transmission: 'Automatic', driver: 'Available on request', bestFor: 'Family trips and mixed road conditions', price: 220000, available: true, image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=900&q=80', images: ['https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=1200&q=80'], features: 'Cruise control · AWD' },
+  { id: 'toyota-rav4', name: 'Toyota RAV4', type: 'suv', seats: 5, luggage: '3 large bags', transmission: 'Automatic', driver: 'Available on request', bestFor: 'Weekend getaways with the family', price: 195000, available: true, image: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=900&q=80', images: ['https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=1200&q=80'], features: 'Apple CarPlay · AWD' },
+  { id: 'toyota-prado', name: 'Toyota Prado', type: 'suv', seats: 7, luggage: '3 large bags', transmission: 'Automatic', driver: 'Available on request', bestFor: 'Family trips and mixed road conditions', price: 280000, available: true, image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=900&q=80', images: ['https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=1200&q=80'], features: 'Cruise control · AWD' },
+  { id: 'toyota-hiace', name: 'Toyota Hiace', type: 'van', seats: 14, luggage: '8 large bags', transmission: 'Manual', driver: 'Driver recommended', bestFor: 'Friends, teams, and small group tours', price: 350000, available: true, image: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=900&q=80', images: ['https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1464219782431-426ba794f59b?auto=format&fit=crop&w=1200&q=80'], features: '14 seats · Spacious' },
+  { id: 'toyota-noah', name: 'Toyota Noah', type: 'van', seats: 7, luggage: '3 large bags', transmission: 'Automatic', driver: 'Available on request', bestFor: 'Family trips and small group outings', price: 180000, available: true, image: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=900&q=80', images: ['https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1464219782431-426ba794f59b?auto=format&fit=crop&w=1200&q=80'], features: '7 seats · Spacious' },
+  { id: 'toyota-coaster', name: 'Toyota Coaster', type: 'van', seats: 22, luggage: '14 large bags', transmission: 'Manual', driver: 'Driver required', bestFor: 'Large groups, church trips, and events', price: 480000, available: false, image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=900&q=80', images: ['https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1200&q=80', 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1200&q=80'], features: '22 seats · Group travel' }
 ];
 
 const typeLabels = { sedan: 'Sedans', suv: 'SUVs', van: 'Vans' };
@@ -108,7 +77,6 @@ async function api(path, options = {}) {
     if (conflict) fail('Those dates are already requested for this car. Please choose different dates.', 409);
     const quote = quoteFromForm(vehicle, { pickupDate: { value: body.pickupDate }, returnDate: { value: body.returnDate }, includeDriver: { checked: body.includeDriver }, includeChildSeat: { checked: body.includeChildSeat }, pickupLocation: { value: body.pickupLocation }, returnLocation: { value: body.returnLocation } });
     const booking = { reference: `ER-${Math.random().toString(36).slice(2, 8).toUpperCase()}`, vehicleId: vehicle.id, vehicleName: vehicle.name, name: body.name, email: body.email, phone: body.phone, pickupDate: body.pickupDate, returnDate: body.returnDate, pickupTime: body.pickupTime, returnTime: body.returnTime, pickupLocation: body.pickupLocation, returnLocation: body.returnLocation, requests: body.requests || '', status: 'pending', createdAt: new Date().toISOString(), ...quote };
-    await sendBookingEmail(booking);
     return { ok: true, booking };
   }
   if ((match = path.match(/^\/api\/bookings\/(.+)$/)) && method === 'PATCH') {
@@ -174,7 +142,7 @@ function vehicleCard(vehicle) {
       <div class="vehicle-name-row"><h3>${vehicle.name}</h3><div class="vehicle-price">${formatUGX(vehicle.price)}<small>per day</small></div></div>
       <p class="best-for">${vehicle.bestFor}</p>
       <div class="specs"><span>${vehicle.seats} seats</span><span>${vehicle.luggage}</span><span>${vehicle.transmission}</span><span>${vehicle.driver}</span></div>
-      <div class="card-bottom"><span class="feature-line">${vehicle.features}</span><button class="card-button" type="button" data-open="${vehicle.id}" ${!vehicle.available ? 'disabled' : ''}>${vehicle.available ? 'Book this car ↗' : 'Unavailable'}</button></div>
+      <div class="card-bottom"><span class="feature-line">${vehicle.features}</span><button class="card-button" type="button" data-open="${vehicle.id}" ${!vehicle.available ? 'disabled' : ''}>${vehicle.available ? 'See details ↗' : 'Unavailable'}</button></div>
     </div>
   </article>`;
 }
@@ -183,12 +151,6 @@ function openDetails(vehicleId) {
   const vehicle = vehicles.find((item) => item.id === vehicleId);
   if (!vehicle) return;
   if (!vehicle.available) return showToast('This car is currently unavailable. Pick another one, or write to us and we will help.', 'error');
-  if (!$('#bookingPage')) {
-    const params = new URLSearchParams(window.location.search);
-    params.set('vehicle', vehicle.id);
-    window.location.href = `booking.html?${params.toString()}`;
-    return;
-  }
   const images = vehicleImages(vehicle);
   const driverRequired = vehicle.driver === 'Driver required';
   $('#modalContent').innerHTML = `
@@ -287,14 +249,9 @@ function openModal() {
   backdrop.classList.remove('closing');
   backdrop.classList.add('open');
   backdrop.setAttribute('aria-hidden', 'false');
-  if ($('#bookingPage')) backdrop.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
   requestAnimationFrame(() => backdrop.classList.add('shown'));
 }
 function closeModal() {
-  if ($('#bookingPage')) {
-    window.location.href = 'booking.html';
-    return;
-  }
   const backdrop = $('#modalBackdrop');
   backdrop.classList.remove('shown');
   backdrop.setAttribute('aria-hidden', 'true');
@@ -309,13 +266,12 @@ function closeModal() {
 async function submitBooking(event, vehicle) {
   event.preventDefault();
   const form = event.currentTarget;
-  if (form.dataset.sending === 'true' || !form.reportValidity()) return;
   const pickupDate = form.pickupDate.value;
   const returnDate = form.returnDate.value;
   if (returnDate < pickupDate) return showToast('Return date must be on or after pickup date.', 'error');
   const payload = {
     vehicleId: vehicle.id,
-    name: form.elements.namedItem('name').value.trim(),
+    name: form.name.value.trim(),
     email: form.email.value.trim(),
     phone: form.phone.value.trim(),
     pickupDate,
@@ -330,7 +286,6 @@ async function submitBooking(event, vehicle) {
   };
   const button = $('#submitBooking');
   button.disabled = true;
-  form.dataset.sending = 'true';
   button.textContent = 'Sending request…';
   try {
     const result = await api('/api/bookings', { method: 'POST', body: JSON.stringify(payload) });
@@ -347,7 +302,6 @@ async function submitBooking(event, vehicle) {
       renderAdmin();
     } else {
       showToast(error.message, 'error');
-      form.dataset.sending = 'false';
       button.disabled = false;
       button.innerHTML = 'Send booking request <span>↗</span>';
     }
@@ -362,7 +316,7 @@ function showBookingConfirmation(booking, previews, emailSent, errorMessage) {
     <p class="eyebrow">${emailSent ? 'Request received' : 'Request saved'}</p>
     <h2 id="modalTitle">${emailSent ? `Thanks, ${booking.name.split(' ')[0]}.` : 'We could not email you yet.'}</h2>
     <p class="modal-intro">${emailSent
-      ? 'The email service has accepted your request with this reference. We will check the dates and contact you to confirm the booking or suggest another car.'
+      ? 'Your request has been saved with this reference. We will check the dates and contact you to confirm the booking or suggest another car.'
       : errorMessage}</p>
     <div class="confirmation-card">
       <strong>${booking.reference}</strong>
@@ -428,7 +382,7 @@ $('#searchForm')?.addEventListener('submit', (event) => {
   const end = $('#searchReturnDate').value;
   if (end < start) return showToast('Return date must be after pickup date.', 'error');
   const params = new URLSearchParams({ pickup: $('#searchPickup').value, pickupDate: start, returnDate: end });
-  window.location.href = `booking.html?${params.toString()}#fleet`;
+  window.location.href = `cars.html?${params.toString()}#fleet`;
 });
 $('#contactForm')?.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -436,8 +390,8 @@ $('#contactForm')?.addEventListener('submit', async (event) => {
   const button = form.querySelector('button');
   button.disabled = true;
   try {
-    const subject = encodeURIComponent(`Message from ${form.elements.namedItem('name').value}`);
-    const text = encodeURIComponent(`${form.message.value}\n\n${form.elements.namedItem('name').value}\n${form.email.value}`);
+    const subject = encodeURIComponent(`Message from ${form.name.value}`);
+    const text = encodeURIComponent(`${form.message.value}\n\n${form.name.value}\n${form.email.value}`);
     window.location.href = `mailto:hello@esromridez.ug?subject=${subject}&body=${text}`;
     form.reset();
     showToast('Opening your email app so you can send your message to Esrom Ridez.');
@@ -532,7 +486,6 @@ if ($('#searchPickup') && ['Kampala', 'Entebbe', 'Jinja'].includes(searchParams.
 renderFleet();
 renderAdmin();
 loadFromServer();
-if ($('#bookingPage') && searchParams.get('vehicle')) openDetails(searchParams.get('vehicle'));
 if (window.location.hash === '#staff' && $('#adminView')) {
   $('#adminView').classList.add('active');
   loadFromServer();
